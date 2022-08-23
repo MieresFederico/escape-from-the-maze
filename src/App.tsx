@@ -1,57 +1,90 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import Layout from "./components/Layout";
+import Maze from "./features/maze/Maze";
+import styles from "./App.module.css";
+import Button from "./components/Button";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import {
+  moveCounterRestart,
+  moveCountReport,
+  selectMoveCountReportStatus,
+  selectPlayerMoveCount,
+  setPosition,
+} from "./features/player/playerSlice";
+import { selectMaze, selectMazeCompleted } from "./features/maze/mazeSlice";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getWayToEnd } from "./utils";
+import { Coordinate } from "./types";
 
 function App() {
+  const dispatch = useAppDispatch();
+  const [usedSolution, setUsedSolution] = useState(false);
+  const [noSolution, setNoSolution] = useState(false);
+  const intervalRef = useRef<any>();
+  const { board, start, end } = useAppSelector(selectMaze);
+  const moves = useAppSelector(selectPlayerMoveCount);
+  const isMazeCompleted = useAppSelector(selectMazeCompleted);
+  const moveCountReportStatus = useAppSelector(selectMoveCountReportStatus);
+
+  useEffect(() => {
+    if (isMazeCompleted && !usedSolution) {
+      dispatch(moveCountReport(moves));
+    }
+  }, [dispatch, moves, isMazeCompleted, usedSolution]);
+
+  const handleRestart = useCallback(() => {
+    if (start) dispatch(setPosition(start));
+    dispatch(moveCounterRestart());
+    setUsedSolution(false);
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  }, [dispatch, start]);
+
+  const handleSolution = useCallback(() => {
+    if (board && start && end && !intervalRef.current && !noSolution) {
+      const coordinatesToEnd = getWayToEnd(board, start, end);
+
+      if (!coordinatesToEnd) {
+        setNoSolution(true);
+        return;
+      }
+
+      setUsedSolution(true);
+      intervalRef.current = window.setInterval(() => {
+        if (!coordinatesToEnd.length) {
+          clearInterval(intervalRef.current);
+          return;
+        }
+        dispatch(setPosition(coordinatesToEnd.shift() as Coordinate));
+      }, 200);
+    }
+  }, [dispatch, board, start, end, noSolution]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <Layout>
+      <div className={styles.root}>
+        <div className={styles.actions}>
+          <Button onClick={handleRestart}>Restart</Button>
+          <Button onClick={handleSolution}>Solution</Button>
+        </div>
+        <p
+          className={`${styles.textCentered} ${
+            (isMazeCompleted || usedSolution) && styles.hidden
+          }`}
+        >{`Movements: ${moves}`}</p>
+        <Maze />
+        {noSolution && <p>CAN'T SOLVE</p>}
+        {isMazeCompleted &&
+          (!usedSolution ? (
+            <>
+              <p>YOU WIN!</p>
+              <p>You escaped in {moves} movements!</p>
+              <p>{moveCountReportStatus}</p>
+            </>
+          ) : (
+            <p>Restart and do it by yourself</p>
+          ))}
+      </div>
+    </Layout>
   );
 }
 

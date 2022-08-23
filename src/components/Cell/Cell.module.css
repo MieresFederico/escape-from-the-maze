@@ -1,0 +1,22 @@
+.root {
+  height: 2rem;
+  width: 2rem;
+  display: inline-flex;
+  background-color: rgb(59, 66, 82);
+}
+
+.wall {
+  background-color: black;
+}
+
+.space {
+  background-color: white;
+}
+
+.start {
+  background-color: green;
+}
+
+.end {
+  background-color: red;
+}

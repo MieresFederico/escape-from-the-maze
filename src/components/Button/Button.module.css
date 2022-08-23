@@ -1,0 +1,19 @@
+.root {
+  cursor: pointer;
+  background-color: rgb(143, 188, 187);
+  border-radius: 3px;
+  border: 1px solid rgb(143, 188, 187);
+  color: rgb(46, 52, 64);
+  display: inline-block;
+  font-weight: 400;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s ease 0s, color 0.2s ease 0s;
+  font-size: 0.9rem;
+}
+
+.root:hover {
+  background-color: transparent;
+  color: rgb(143, 188, 187);
+}

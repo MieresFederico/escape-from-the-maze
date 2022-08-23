@@ -1,0 +1,38 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  gap: 1rem;
+}
+
+.header {
+  align-items: center;
+  background-color: rgb(32, 35, 42);
+  display: flex;
+  font-size: 0.8rem;
+  height: 3rem;
+  padding: 0px 2rem;
+  width: 100%;
+  color: rgb(143, 188, 187);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.content {
+  flex-grow: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  background-color: rgb(32, 35, 42);
+  color: rgb(216, 222, 233);
+  padding: 2rem 2rem 2rem;
+  width: 100%;
+  text-align: center;
+}
